@@ -1,274 +1,178 @@
-# 🚀 AI Product Recommendation System
+# 🤖 AI Product Recommendation System
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
-![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
-![Machine Learning](https://img.shields.io/badge/AI-Recommendation%20Engine-orange)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
-
-An **AI-powered recommendation backend** that tracks user interactions and generates product recommendations using behavioral data.
-
-The system collects user activity such as **views, clicks, cart actions, and purchases**, converts them into weighted scores, and uses this data to generate **popular and personalized recommendations**.
+An intelligent product recommendation system built with Python, FastAPI, and Machine Learning. Uses real Amazon Electronics data to provide personalized product recommendations through multiple ML approaches.
 
 ---
 
-# 📌 Features
-
-* Product catalog management
-* User interaction tracking
-* Interaction scoring engine
-* Popularity-based recommendations
-* RESTful API with FastAPI
-* MongoDB Atlas cloud database
-* Auto-generated API documentation using Swagger
+## 🏗️ Project Architecture
+```
+AI-Product-Recommendation-System/
+├── backend/                  → FastAPI REST API server
+│   └── app/
+│       ├── main.py           → App entry point
+│       ├── ml_engine.py      → ML models integration
+│       ├── models/           → Database models
+│       └── routes/           → API endpoints
+├── ml_service/               → Machine Learning pipeline
+│   ├── data/
+│   │   ├── raw/              → Original dataset (not tracked)
+│   │   └── processed/        → Cleaned dataset (not tracked)
+│   ├── src/
+│   │   ├── preprocess.py     → Data cleaning pipeline
+│   │   ├── popularity.py     → Popularity-based recommender
+│   │   ├── collaborative.py  → Collaborative filtering
+│   │   └── hybrid.py         → Hybrid recommendation system
+│   └── outputs/              → Charts and result CSVs
+└── frontend/                 → React/Next.js UI (in progress)
+```
 
 ---
 
-# 🧠 How the Recommendation System Works
+## 🧠 ML Models Implemented
 
-The system learns user preferences based on interaction behavior.
+### 1. Popularity-Based Recommender
+- Recommends globally popular products
+- Uses **IMDB Weighted Rating Formula**
+- Formula: `Score = (v/(v+m)) × R + (m/(v+m)) × C`
+- Not personalized — same for all users
 
-### Interaction Types
+### 2. Collaborative Filtering (Item-Based)
+- Personalized recommendations per user
+- Uses **Cosine Similarity** to find similar products
+- Based on user's highly rated products (≥ 4 stars)
+- Built with pandas + scikit-learn
 
-| Interaction | Score |
-| ----------- | ----- |
-| View        | 1     |
-| Click       | 2     |
-| Add to Cart | 3     |
-| Purchase    | 5     |
+### 3. Hybrid Recommendation System
+- Combines Popularity + Collaborative Filtering
+- Weighted formula: `Score = 0.4 × Popularity + 0.6 × CF`
+- Most accurate and robust approach
+- Best of both worlds
 
-Higher interaction scores indicate **stronger user interest in a product**.
+---
 
-Example:
+## 📊 Dataset
 
+- **Source:** Amazon Electronics Reviews (Kaggle)
+- **Original size:** 7,824,482 ratings
+- **After preprocessing:** 2,109,869 ratings
+- **Active users:** 253,994
+- **Active products:** 145,199
+- **Matrix sparsity:** 99.99%
+
+### Dataset Setup
+> Dataset is not included in the repo due to file size.
+
+1. Download `ratings_Electronics.csv` from [Kaggle](https://www.kaggle.com/datasets/vibivij/amazon-electronics-rating-datasetrecommendation)
+2. Place it in `ml_service/data/raw/`
+3. Run preprocessing:
+```bash
+cd ml_service/src
+python preprocess.py
+```
+
+---
+
+## 🚀 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/recommendations/popular` | Top N popular products |
+| GET | `/recommendations/collaborative/{user_id}` | CF recommendations for user |
+| GET | `/recommendations/hybrid/{user_id}` | Hybrid recommendations for user |
+| GET | `/products` | Get all products |
+| POST | `/add-product` | Add a new product |
+| POST | `/track-interaction` | Track user interaction |
+
+### Example Response — Hybrid API
 ```json
 {
-"user_id": "user123",
-"product_id": "iPhone 14",
-"interaction_type": "purchase",
-"score": 5
+  "type": "hybrid",
+  "user_id": "ADLVFFE4VBT8",
+  "count": 10,
+  "recommendations": [
+    {
+      "rank": 1,
+      "product_id": "B0082E9K7U",
+      "hybrid_score": 0.9696,
+      "popularity_score": 0.9303,
+      "cf_score": 0.9958
+    }
+  ]
 }
 ```
 
-These scores are aggregated to determine **product popularity and relevance**.
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python, FastAPI, Uvicorn |
+| Database | MongoDB |
+| ML | Pandas, NumPy, Scikit-learn |
+| Visualization | Matplotlib, Seaborn |
+| Frontend | React / Next.js (planned) |
+| Version Control | Git, GitHub |
 
 ---
 
-# 🏗 System Architecture
-
-```mermaid
-flowchart LR
-
-A[Frontend UI] --> B[FastAPI Backend]
-B --> C[Product API]
-B --> D[Interaction API]
-
-C --> E[(MongoDB Atlas)]
-D --> E
-
-E --> F[Recommendation Engine]
-
-F --> G[Popular Products API]
-```
-
----
-
-# ⚙️ Tech Stack
+## ⚙️ Local Setup
 
 ### Backend
-
-* FastAPI
-* Python
-
-### Database
-
-* MongoDB Atlas
-* PyMongo
-
-### Machine Learning (Planned)
-
-* Scikit-learn
-* Pandas
-* Cosine Similarity
-
-### Tools
-
-* Git
-* GitHub
-* Swagger Docs
-
----
-
-# 📂 Project Structure
-
-```
-AI-Product-Recommendation-System
-│
-├── backend
-│   ├── app
-│   │
-│   ├── models
-│   │   ├── product_model.py
-│   │   └── interaction_model.py
-│   │
-│   ├── routes
-│   │   ├── product_routes.py
-│   │   └── interaction_routes.py
-│   │
-│   ├── database.py
-│   └── main.py
-│
-├── frontend
-│
-├── ml_service
-│
-└── docs
-```
-
----
-
-# 🔌 API Endpoints
-
-### Product APIs
-
-| Method | Endpoint       | Description        |
-| ------ | -------------- | ------------------ |
-| POST   | `/add-product` | Add new product    |
-| GET    | `/products`    | Fetch all products |
-
-Example Request
-
-```json
-{
-"name": "iPhone 14",
-"category": "Electronics",
-"description": "Apple smartphone",
-"price": 70000,
-"image_url": "https://example.com/iphone.jpg"
-}
-```
-
----
-
-### Interaction APIs
-
-| Method | Endpoint             | Description            |
-| ------ | -------------------- | ---------------------- |
-| POST   | `/track-interaction` | Track user interaction |
-| GET    | `/interactions`      | Retrieve interactions  |
-
-Example Request
-
-```json
-{
-"user_id": "user123",
-"product_id": "iPhone 14",
-"interaction_type": "view"
-}
-```
-
----
-
-### Recommendation API
-
-| Method | Endpoint            | Description              |
-| ------ | ------------------- | ------------------------ |
-| GET    | `/popular-products` | Get recommended products |
-
-Example Output
-
-```json
-[
-{
-"product_id": "iPhone 14",
-"total_score": 6
-}
-]
-```
-
----
-
-# 🚀 Getting Started
-
-## Clone Repository
-
-```
-git clone https://github.com/Amey-Kalsapnavar/AI-Product-Recommendation-System.git
-cd AI-Product-Recommendation-System
-```
-
----
-
-## Setup Backend
-
-```
+```bash
 cd backend
-
 python -m venv venv
-venv\Scripts\activate
-
+venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-```
-
----
-
-## Run Server
-
-```
 uvicorn app.main:app --reload
 ```
 
-Server runs at
+### ML Service
+```bash
+cd ml_service
+python -m venv venv
+venv\Scripts\activate        # Windows
+pip install -r requirements.txt
 
-```
-http://127.0.0.1:8000
+# Run ML pipeline
+cd src
+python preprocess.py
+python popularity.py
+python collaborative.py
+python hybrid.py
 ```
 
-Swagger API Docs
-
-```
-http://127.0.0.1:8000/docs
-```
+### API Documentation
+Visit `http://127.0.0.1:8000/docs` for interactive Swagger UI
 
 ---
 
-# 🧩 Future Enhancements
+## 📈 Results
 
-* Content-based recommendation
-* Collaborative filtering
-* Hybrid recommendation system
-* Personalized user recommendations
-* Frontend dashboard
-* Model deployment
-
----
-
-# 📊 Recommendation Pipeline
-
-```mermaid
-flowchart TD
-
-A[User Interaction] --> B[Interaction API]
-B --> C[MongoDB Storage]
-C --> D[Score Calculation]
-D --> E[Recommendation Engine]
-E --> F[Recommended Products]
-```
+### Top Popular Products (Sample)
+| Rank | Product ID | Avg Rating | Ratings | Score |
+|------|-----------|-----------|---------|-------|
+| 1 | B005LJQPE0 | 4.95 | 105 | 4.888 |
+| 2 | B0033PRWSW | 4.91 | 201 | 4.882 |
+| 3 | B007SZ0E1K | 4.88 | 324 | 4.865 |
 
 ---
 
-# 📜 License
+## 🗺️ Project Roadmap
 
-This project is licensed under the **MIT License**.
+- [x] Backend setup (FastAPI + MongoDB)
+- [x] Dataset collection and preprocessing
+- [x] Popularity-Based Recommendation
+- [x] Collaborative Filtering
+- [x] Hybrid Recommendation System
+- [x] ML API Integration with FastAPI
+- [ ] React Frontend UI
+- [ ] User Authentication
+- [ ] Real-time recommendations
 
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
 **Amey Kalsapnavar**
-
-Information Technology
-Vishwakarma Institute of Information Technology, Pune
-
-GitHub
-https://github.com/Amey-Kalsapnavar
+Individual Internship Project
