@@ -38,3 +38,10 @@ def hybrid_recommendations(user_id: str, top_n: int = 10):
         "count": len(results) if isinstance(results, list) else 0,
         "recommendations": results
     }
+    
+@router.get("/users/sample")
+def get_sample_users():
+    """Get sample user IDs that have personalized recommendations"""
+    from app.ml_engine import get_sample_users
+    users = get_sample_users(n=20)
+    return {"users": users}
